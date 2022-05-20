@@ -11,7 +11,20 @@ class _HomePageState extends State<HomePage> {
 
   // List<String> netImgs = [];
   List<String> assetImgs = [];
-  List<int> pages = [0, 1, 49, 76, 105, 127, 150, 176, 186, 207, 220, 234, 248, 254, 261, 266, 281, 292, 600];
+  /*List<int> pages = [
+    0, 1, 49, 76, 105, 127, 150, 176, 186, 207,
+    220, 234, 248, 254, 261, 266, 281, 292, 304, 311,
+    321, 331, 341, 349, 358, 366, 376, 384, 395, 403,
+    410, 414, 417, 427, 433, 439, 445, 452, 547, 466,
+    476, 482, 488, 495, 498, 501, 506, 510, 514, 517,
+    519, 522, 525, 527, 530, 533, 536, 541, 544, 548,
+    550, 552, 553, 555, 557, 559, 561, 563, 565, 567,
+    569, 571, 573, 574, 576, 577, 579, 581, 582, 584,
+    585, 586, 586, 588, 589, 590, 590, 591, 592, 593,
+    594, 594, 595, 595, 596, 596, 597, 597, 598, 598,
+    599, 599, 600, 600, 600, 601, 601, 601, 602, 602,
+    602, 603, 603, 603
+  ];*/
   CarouselController myCarousel = CarouselController();
 
   @override
@@ -49,9 +62,9 @@ class _HomePageState extends State<HomePage> {
               title: const Text('تغيير السورة'),
               onTap: () async {
                 Navigator.pop(context);
-                final i = (await Get.to(ChooseSurat()) ?? 0);
+                final i = (await Get.to(() => ChooseSurat()) ?? 0);
                 print('newSuratPage : $i');
-                myCarousel.jumpToPage(pages[i]);
+                myCarousel.jumpToPage(i);
               },
             ),
             ListTile(

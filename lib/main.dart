@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'home.dart';
 import 'choose_surat.dart';
 
-void main() => runApp(MaterialApp(
+void main() => runApp(GetMaterialApp(
   debugShowCheckedModeBanner: false,
   routes: {
     '/Home' : (context) => HomePage(),
