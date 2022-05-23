@@ -30,6 +30,18 @@ class ChooseSurat extends StatelessWidget {
     Surat(name: 'المسد', page: 602, nbAyat: 0), Surat(name: 'الإخلاص', page: 603, nbAyat: 0), Surat(name: 'الفلق', page: 603, nbAyat: 0), Surat(name: 'الناس', page: 603, nbAyat: 0)
   ];
 
+  static int getHizb(int Hizb) {
+    List pgs = [
+      0, 10, 21, 31, 41, 50, 61, 71, 81, 91,
+      101, 111, 120, 131, 141, 150, 161, 172, 181, 191,
+      200, 211, 221, 230, 241, 251, 261, 271, 281, 291,
+      301, 311, 321, 331, 341, 351, 361, 370, 381, 391,
+      401, 412, 422, 430, 441, 450, 461, 471, 481, 490,
+      501, 512, 521, 530, 541, 552, 561, 671, 681, 690
+    ];
+    return pgs[Hizb - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
