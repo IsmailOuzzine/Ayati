@@ -20,8 +20,7 @@ class _HomePageState extends State<HomePage> {
   late SharedPreferences? _prefs ;
   late int? _mark = 0;
 
-  void
-  nitMark() async{
+  void initMark() async{
     _prefs = await SharedPreferences.getInstance();
     _mark = await _prefs?.getInt('mark');
   }
