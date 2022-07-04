@@ -37,7 +37,7 @@ class ChooseSurat extends StatelessWidget {
       200, 211, 221, 230, 241, 251, 261, 271, 281, 291,
       301, 311, 321, 331, 341, 351, 361, 370, 381, 391,
       401, 412, 422, 430, 441, 450, 461, 471, 481, 490,
-      501, 512, 521, 530, 541, 552, 561, 671, 681, 690
+      501, 512, 521, 530, 541, 552, 561, 571, 581, 590
     ];
     return pgs[Hizb - 1];
   }
@@ -65,9 +65,10 @@ class ChooseSurat extends StatelessWidget {
                     child: Center(
                       child: Text(
                         e.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
+                          fontSize: 20.0
                         ),
                       ),
                     ),

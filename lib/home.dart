@@ -1,10 +1,9 @@
-import 'dart:ffi';
-
 import 'package:ayati/choose_surat.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,12 +17,21 @@ class _HomePageState extends State<HomePage> {
   CarouselController myCarousel = CarouselController();
   late TextEditingController _textEditingController;
   late int _currentIndex;
+  late SharedPreferences? _prefs ;
+  late int? _mark = 0;
+
+  void
+  nitMark() async{
+    _prefs = await SharedPreferences.getInstance();
+    _mark = await _prefs?.getInt('mark');
+  }
 
   @override
   void initState() {
     super.initState();
     _currentIndex = 0;
     _textEditingController = TextEditingController();
+    initMark();
   }
 
   @override
@@ -42,9 +50,14 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Color.fromRGBO(255, 255, 203, 1),
       appBar: AppBar(
-        title : const Text('آياتي - المصحف الشريف'),
+        title : const Text(
+            'آياتي - المصحف الشريف',
+          style: TextStyle(
+            fontWeight: FontWeight.bold
+          ),
+        ),
         backgroundColor: Colors.brown[600],
         centerTitle: true,
       ),
@@ -56,57 +69,172 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(
                 color: Colors.brown,
               ),
-              child : Text(
-                'Drawer Header',
-                style: TextStyle(
-                  color: Colors.white,
+              child : Center(
+                child: CircleAvatar(
+                  backgroundImage: AssetImage('images/logo.jpg'),
+                  radius: 60.0,
                 ),
               ),
             ),
-            ListTile(
-              title: const Text('تغيير السورة'),
-              onTap: () async {
+            TextButton.icon(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+              ),
+              icon: const Icon(
+                Icons.app_registration_rounded,
+                color: Colors.brown,
+              ),
+              label: const Text(
+                    'تغيير السورة',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.brown,
+                      fontSize: 16.0
+                  ),
+                ),
+              onPressed: () async {
                 Navigator.pop(context);
                 final i = (await Get.to(() => ChooseSurat()) ?? _currentIndex);
                 print('newSuratPage : $i');
                 myCarousel.jumpToPage(i);
               },
             ),
-            ListTile( // PAGE changing
-              title: const Text('تغيير الصفحة'),
-              onTap: () async {
-                final int i = await openDialog('choosePage') ?? _currentIndex + 1;
+            TextButton.icon( // PAGE changing
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+              ),
+              icon: const Icon(
+                  Icons.auto_stories,
+                color: Colors.brown,
+              ),
+              label: const Text(
+                    'تغيير الصفحة',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.brown,
+                      fontSize: 16.0
+                  ),
+                ),
+              onPressed: () async {
+                final int i = await openDialog('choosePage') ?? _currentIndex;
                 print('////////////////////////newSuratPage : $i////////////////////////////////');
                 Navigator.of(context).pop();
-                myCarousel.jumpToPage(i-1);
+                myCarousel.jumpToPage(i);
               } ,
             ),
-            ListTile( // HIZB changing
-              title: const Text('تغيير الحزب'),
-              onTap: () async {
-                final int i = await openDialog('chooseHizb') ?? _currentIndex + 1;
+            TextButton.icon( // HIZB changing
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+              ),
+              icon: const Icon(
+                Icons.edit_note_rounded,
+                color: Colors.brown,
+              ),
+              label: const Text(
+                    'تغيير الحزب',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.brown,
+                      fontSize: 16.0
+                  ),
+                ),
+              onPressed: () async {
+                final int i = await openDialog('chooseHizb') ?? _currentIndex;
                 print('////////////////////////newSuratPage : $i////////////////////////////////');
                 Navigator.of(context).pop();
                 myCarousel.jumpToPage(i);
               },
+            ),
+            TextButton.icon( // JUZ' changing
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+              ),
+              icon: const Icon(
+                Icons.format_list_numbered,
+                color: Colors.brown,
+              ),
+              label: const Text(
+                    'تغيير الجزء',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.brown,
+                      fontSize: 16.0
+                  ),
+                ),
+              onPressed: () async {
+                final int i = await openDialog('chooseJUZ') ?? _currentIndex;
+                print('////////////////////////newSuratPage : $i////////////////////////////////');
+                Navigator.of(context).pop();
+                myCarousel.jumpToPage(i);
+              },
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton.icon( // change the mark
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 0),
+                ),
+                  icon: const Icon(
+                      Icons.book_outlined,
+                    color: Colors.brown,
+                  ),
+                  label: const Text(
+                      'تغيير العلامة',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown,
+                        fontSize: 16.0
+                    ),
+                  ),
+                  onPressed: () async {
+                    _mark = _currentIndex;
+                    await _prefs?.setInt('mark', _mark!);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton.icon( // change to mark
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 0),
+                ),
+                  icon: const Icon(
+                    Icons.bookmark,
+                    color: Colors.brown,
+                  ),
+                  label: const Text(
+                      'انتقل إلى العلامة',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown,
+                        fontSize: 16.0
+                    ),
+                  ),
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    myCarousel.jumpToPage(_mark!);
+                  },
+                ),
+              ],
             )
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            CarouselSlider.builder(
-              itemCount: 604,
-              carouselController: myCarousel,
-              itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
-                return Container(
-                      padding: const EdgeInsets.all(0),
-                      child: InteractiveViewer(
-                          child: Image.asset('images/warsh/${assetImgs[itemIndex]}')),
-                    );
-                  },
-              options: CarouselOptions(
+             CarouselSlider.builder(
+                itemCount: 604,
+                carouselController: myCarousel,
+                itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+                  return Container(
+                    padding: const EdgeInsets.all(0),
+                    child: InteractiveViewer(
+                        child: Image.asset('images/warsh/${assetImgs[itemIndex]}')),
+                  );
+                },
+                options: CarouselOptions(
                   aspectRatio: 15/24,
                   autoPlay: false,
                   enableInfiniteScroll: false,
@@ -115,12 +243,14 @@ class _HomePageState extends State<HomePage> {
                   reverse: true,
                   onPageChanged: (index, reason) {
                     _currentIndex = index;
+                    // shared ...
                     print('_currentIndex = $_currentIndex');
                     setState((){});
                   },
+                ),
               ),
-            ),
-          ],
+            ],
+          )
         ),
       ),
     );
@@ -138,20 +268,21 @@ class _HomePageState extends State<HomePage> {
                 autofocus: true,
                 controller: _textEditingController,
                 keyboardType: const TextInputType.numberWithOptions(
-                  signed: false, decimal: false),
+                  signed: false, decimal: false
+                ),
               ),
               actions: <Widget>[
                 TextButton(
-                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  onPressed: () => Navigator.pop(context, _currentIndex),
                   child: const Text('إلغاء'),
                 ),
                 TextButton(
                   onPressed: () {
-                    int n = _currentIndex + 1;
+                    int n = _currentIndex;
                     try {
-                      n = int.parse(_textEditingController.text);
+                      n = int.parse(_textEditingController.text) - 1;
                     } catch (e) {
-                      n = _currentIndex + 1;
+                      n = _currentIndex;
                     }
                     Navigator.pop(context, n);
                   },
@@ -169,38 +300,80 @@ class _HomePageState extends State<HomePage> {
       return showDialog<int>(
         context: context,
         builder: (BuildContext context) =>
-        AlertDialog(
-          title: const Text('تغيير الحزب'),
-          content: SizedBox(
-            width: 200.0,
-            height: 400.0,
-            child: ListView(
-              children: myList.map((e) {
-                return Card(
-                  child: Center(
-                    child: TextButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.brown[50]),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(ChooseSurat.getHizb(e));
-                      },
+            AlertDialog(
+              title: const Text('تغيير الحزب'),
+              content: SizedBox(
+                width: 200.0,
+                height: 400.0,
+                child: ListView(
+                  children: myList.map((e) {
+                    return Card(
                       child: Center(
-                        child: Text(
-                          'الحزب ${e.toString()}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.brown
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(Colors.brown[50]),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(ChooseSurat.getHizb(e));
+                          },
+                          child: Center(
+                            child: Text(
+                              'الحزب ${e.toString()}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.brown
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                );
-              }).toList(),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
-          ),
-        ),
+      );
+    }
+    else if (type == 'chooseJUZ') {
+      var myList = [];
+      for(int i  = 1; i <= 30; i++) {
+        myList.add(i);
+      }
+      return showDialog<int>(
+        context: context,
+        builder: (BuildContext context) =>
+            AlertDialog(
+              title: const Text('تغيير الجزء'),
+              content: SizedBox(
+                width: 200.0,
+                height: 400.0,
+                child: ListView(
+                  children: myList.map((e) {
+                    return Card(
+                      child: Center(
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(Colors.brown[50]),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(ChooseSurat.getHizb(e*2 - 1));
+                          },
+                          child: Center(
+                            child: Text(
+                              'الجزء ${e.toString()}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.brown
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
       );
     }
   }
