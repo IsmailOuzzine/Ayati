@@ -1,8 +1,10 @@
+import 'package:ayati/Model/mushaf.dart';
+import 'package:ayati/choose_mushaf.dart';
 import 'package:ayati/choose_surat.dart';
+import 'package:ayati/pref_service.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,25 +14,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   // List<String> netImgs = [];
-  List<String> assetImgs = [];
+  List<String> Imgs = [];
 
   CarouselController myCarousel = CarouselController();
   late TextEditingController _textEditingController;
   late int _currentIndex;
-  late SharedPreferences? _prefs ;
-  late int? _mark = 0;
-
-  void initMark() async{
-    _prefs = await SharedPreferences.getInstance();
-    _mark = await _prefs?.getInt('mark');
-  }
+  late int _mark;
+  late Mushaf choosedMushaf;
 
   @override
   void initState() {
     super.initState();
     _currentIndex = 0;
     _textEditingController = TextEditingController();
-    initMark();
+    // print(Get.arguments);
+    _mark = Get.arguments[0];
+    choosedMushaf = Get.arguments[1];
   }
 
   @override
@@ -41,15 +40,20 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    /*for (int i = 1; i < 604; i++) {
-      netImgs.add('https://www.e-quran.com/language/french/french4/images/qp$i.gif');
-    }*/
+
+    /*return Scaffold(
+      body: Center(
+        child: Text(
+          'Get.arguments : ${Get.arguments[1]}'
+        ),
+      ),
+    );*/
     for (int i = 1; i < 605; i++) {
-      assetImgs.add('$i.png');
+      Imgs.add('$i.${choosedMushaf.filesExt}');
     }
 
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 255, 203, 1),
+      backgroundColor: choosedMushaf.bgcolor,
       appBar: AppBar(
         title : const Text(
             'آياتي - المصحف الشريف',
@@ -57,20 +61,20 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold
           ),
         ),
-        backgroundColor: Colors.brown[600],
+        backgroundColor: choosedMushaf.appBarColor,
         centerTitle: true,
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
+            DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.brown,
+                color: choosedMushaf.fontColor,
               ),
               child : Center(
                 child: CircleAvatar(
-                  backgroundImage: AssetImage('images/logo.jpg'),
+                  backgroundImage: AssetImage('images/${choosedMushaf.logoPath}'),
                   radius: 60.0,
                 ),
               ),
@@ -79,15 +83,15 @@ class _HomePageState extends State<HomePage> {
               style: TextButton.styleFrom(
                 padding: EdgeInsets.all(20.0),
               ),
-              icon: const Icon(
+              icon: Icon(
                 Icons.app_registration_rounded,
-                color: Colors.brown,
+                color: choosedMushaf.fontColor,
               ),
-              label: const Text(
+              label: Text(
                     'تغيير السورة',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.brown,
+                      color: choosedMushaf.fontColor,
                       fontSize: 16.0
                   ),
                 ),
@@ -102,15 +106,15 @@ class _HomePageState extends State<HomePage> {
               style: TextButton.styleFrom(
                 padding: EdgeInsets.all(20.0),
               ),
-              icon: const Icon(
+              icon: Icon(
                   Icons.auto_stories,
-                color: Colors.brown,
+                color: choosedMushaf.fontColor,
               ),
-              label: const Text(
+              label: Text(
                     'تغيير الصفحة',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.brown,
+                      color: choosedMushaf.fontColor,
                       fontSize: 16.0
                   ),
                 ),
@@ -125,15 +129,15 @@ class _HomePageState extends State<HomePage> {
               style: TextButton.styleFrom(
                 padding: EdgeInsets.all(20.0),
               ),
-              icon: const Icon(
+              icon: Icon(
                 Icons.edit_note_rounded,
-                color: Colors.brown,
+                color: choosedMushaf.fontColor,
               ),
-              label: const Text(
+              label: Text(
                     'تغيير الحزب',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.brown,
+                      color: choosedMushaf.fontColor,
                       fontSize: 16.0
                   ),
                 ),
@@ -148,15 +152,15 @@ class _HomePageState extends State<HomePage> {
               style: TextButton.styleFrom(
                 padding: EdgeInsets.all(20.0),
               ),
-              icon: const Icon(
+              icon: Icon(
                 Icons.format_list_numbered,
-                color: Colors.brown,
+                color: choosedMushaf.fontColor,
               ),
-              label: const Text(
+              label: Text(
                     'تغيير الجزء',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.brown,
+                      color: choosedMushaf.fontColor,
                       fontSize: 16.0
                   ),
                 ),
@@ -174,21 +178,20 @@ class _HomePageState extends State<HomePage> {
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 0),
                 ),
-                  icon: const Icon(
+                  icon: Icon(
                       Icons.book_outlined,
-                    color: Colors.brown,
+                    color: choosedMushaf.fontColor,
                   ),
-                  label: const Text(
+                  label: Text(
                       'تغيير العلامة',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.brown,
+                        color: choosedMushaf.fontColor,
                         fontSize: 16.0
                     ),
                   ),
                   onPressed: () async {
-                    _mark = _currentIndex;
-                    await _prefs?.setInt('mark', _mark!);
+                    await PrefService.setMark(_currentIndex);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -196,25 +199,55 @@ class _HomePageState extends State<HomePage> {
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 0),
                 ),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.bookmark,
-                    color: Colors.brown,
+                    color: choosedMushaf.fontColor,
                   ),
-                  label: const Text(
+                  label: Text(
                       'انتقل إلى العلامة',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.brown,
+                        color: choosedMushaf.fontColor,
                         fontSize: 16.0
                     ),
                   ),
                   onPressed: () async {
                     Navigator.of(context).pop();
-                    myCarousel.jumpToPage(_mark!);
+                    myCarousel.jumpToPage(_mark);
                   },
                 ),
               ],
-            )
+            ),
+            TextButton.icon(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.all(20.0),
+              ),
+              icon: Icon(
+                Icons.app_registration_rounded,
+                color: choosedMushaf.fontColor,
+              ),
+              label: Text(
+                'تغيير المصحف',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: choosedMushaf.fontColor,
+                    fontSize: 16.0
+                ),
+              ),
+              onPressed: () async {
+                Navigator.pop(context);
+                final i = (await Get.to(() => ChooseMushaf()) ?? PrefService.choosedMushafIndex);
+                print('newMushaf : $i');
+                await PrefService.setMushaf(i);
+                setState(() {
+                  choosedMushaf = ChooseMushaf.mushafs[i];
+                  for (int i = 1; i < 605; i++) {
+                    Imgs[i-1] = '$i.${choosedMushaf.filesExt}';
+                  }
+                  myCarousel.jumpToPage(_currentIndex);
+                });
+              },
+            ),
           ],
         ),
       ),
@@ -227,11 +260,21 @@ class _HomePageState extends State<HomePage> {
                 itemCount: 604,
                 carouselController: myCarousel,
                 itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
-                  return Container(
-                    padding: const EdgeInsets.all(0),
-                    child: InteractiveViewer(
-                        child: Image.asset('images/warsh/${assetImgs[itemIndex]}')),
-                  );
+                  print('choosedMushaf.asset : ${choosedMushaf.asset}');
+                  if (choosedMushaf.asset) {
+                    return Container(
+                      padding: const EdgeInsets.all(0),
+                      child: InteractiveViewer(
+                          child: Image.asset('${choosedMushaf.path}${Imgs[itemIndex]}')),
+                    );
+                  }
+                  else {
+                    return Container(
+                      padding: const EdgeInsets.all(0),
+                      child: InteractiveViewer(
+                          child: Image.network('${choosedMushaf.path}${Imgs[itemIndex]}')),
+                    );
+                  }
                 },
                 options: CarouselOptions(
                   aspectRatio: 15/24,
